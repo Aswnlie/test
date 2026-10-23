@@ -3,7 +3,7 @@
 Group project for Coventry University. We are building a website where users can add movies and
 write reviews.
 
-This branch contains the Student 1 work: the database, registration, login, sessions and demo
+This branch contains the Zhanel Assilbek's work: the database, registration, login, sessions and demo
 accounts. The movie pages, review forms and shared styling are being developed by the other team
 members.
 
