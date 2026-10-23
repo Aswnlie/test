@@ -1,0 +1,32 @@
+<h1>Create an account</h1>
+{{#if errors}}
+  <section role="alert" aria-label="Registration errors">
+    <h2>Please check your details</h2>
+    <ul>
+      {{#each errors}}<li>{{this}}</li>{{/each}}
+    </ul>
+  </section>
+{{/if}}
+<form action="/register" method="post">
+  <input type="hidden" name="csrf" value="{{csrf}}">
+  <p>
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" required
+      minlength="3" maxlength="50" pattern="[A-Za-z0-9_]{3,50}"
+      autocomplete="username" aria-describedby="username-help" value="{{username}}">
+    <small id="username-help">Use 3–50 letters, numbers or underscores. Usernames are stored in lowercase.</small>
+  </p>
+  <p>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required
+      minlength="8" maxlength="72" autocomplete="new-password"
+      aria-describedby="password-help">
+    <small id="password-help">Use at least 8 characters and at most 72 UTF-8 bytes. Non-ASCII characters can take multiple bytes.</small>
+  </p>
+  <p>
+    <label for="confirmPassword">Confirm password</label>
+    <input id="confirmPassword" name="confirmPassword" type="password" required
+      minlength="8" maxlength="72" autocomplete="new-password">
+  </p>
+  <button type="submit">Create account</button>
+</form>
