@@ -1,0 +1,24 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@oak/oak": "jsr:@oak/oak@^17.2.0",
+    "drizzle-kit": "npm:drizzle-kit@^0.31.11",
+    "drizzle-orm": "npm:drizzle-orm@^0.45.4",
+    "handlebars": "npm:handlebars@^4.7.10",
+    "mysql2": "npm:mysql2@^3.24.6",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts"
+  },
+  "tasks": {
+    "db:generate": "deno run -A --env-file=.env npm:drizzle-kit@0.31.11 generate",
+    "db:migrate": "deno run -A --env-file=.env npm:drizzle-kit@0.31.11 migrate",
+    "db:check": "deno run --no-prompt --env-file=.env --allow-env=DB_HOST,DB_PORT,DB_USER,DB_PASSWORD,DB_NAME,TZ --allow-read=./node_modules,../node_modules --allow-net scripts/check-db.ts",
+    "start": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules server.ts",
+    "test:registration": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/registration_test.ts",
+    "test:auth": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/",
+    "db:seed-users": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./node_modules,../node_modules,../../node_modules,../../../node_modules scripts/seed-users.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  }
+}
