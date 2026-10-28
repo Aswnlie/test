@@ -5,14 +5,14 @@ for (
   const name of ["register", "registered", "login", "account", "home", "layouts/main"]
 ) {
   const source = await Deno.readTextFile(
-    new URL(`./${name}.hbs`, import.meta.url),
+    new URL(`./${name}.html`, import.meta.url),
   );
   templates.set(name, Handlebars.compile(source));
 }
 Handlebars.registerPartial(
   "header",
   await Deno.readTextFile(
-    new URL("./partials/header.hbs", import.meta.url),
+    new URL("./partials/header.html", import.meta.url),
   ),
 );
 

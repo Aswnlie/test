@@ -107,7 +107,10 @@ combined changes, open a pull request from `dev` into `main`.
 
 Branch `NurymZhumabayev` starts from `dev` and adds the homepage at `/`, shared header,
 responsive catalogue, title search, latest-review dates and administrator deletion.
-The frontend uses Handlebars HTML, plain CSS and plain JavaScript, with no frontend framework.
+All page templates use the `.html` extension in `views/`. The server still renders them with
+Handlebars, so movies, sessions and CSRF protection keep working. The frontend uses plain CSS
+and JavaScript, with no frontend framework. Open pages through the running server; opening a
+template directly from disk will not substitute its `{{...}}` expressions.
 `movies/catalogue.ts` reads the existing MySQL tables through the shared Drizzle client.
 No separate API service is needed: Oak renders the HTML and accepts normal form submissions.
 
