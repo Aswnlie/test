@@ -1,0 +1,367 @@
+/* Simple shared layout; the final global stylesheet belongs to Student 5. */
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  background: #faf9f6;
+  color: #252a25;
+  font: 16px/1.5 Arial, sans-serif;
+}
+a {
+  color: #34563e;
+  text-underline-offset: 4px;
+}
+a:hover {
+  color: #162d1d;
+}
+button,
+input {
+  font: inherit;
+}
+button,
+.button {
+  cursor: pointer;
+}
+button,
+.button {
+  border: 1px solid #34563e;
+  border-radius: 6px;
+  padding: 9px 15px;
+  background: #34563e;
+  color: white;
+}
+.button {
+  display: inline-block;
+  text-decoration: none;
+}
+.button:hover,
+button:hover {
+  background: #263f2e;
+  color: white;
+}
+input {
+  max-width: 100%;
+  padding: 9px 12px;
+  border: 1px solid #bcbfb7;
+  border-radius: 6px;
+  background: white;
+}
+:focus-visible {
+  outline: 3px solid #aa632a;
+  outline-offset: 4px;
+}
+h1,
+h2,
+h3,
+p {
+  margin: 0 0 12px;
+}
+h1 {
+  font-size: 32px;
+  line-height: 1.2;
+}
+h2 {
+  font-size: 24px;
+}
+h3 {
+  font-size: 17px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 24px max(24px, calc((100% - 1200px) / 2));
+  border-bottom: 1px solid #dedfd7;
+  background: white;
+}
+.brand {
+  white-space: nowrap;
+  font-size: 21px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #252a25;
+}
+.brand span {
+  color: #698163;
+}
+.search {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+.search input {
+  width: 100%;
+  min-width: 0;
+}
+nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+nav a {
+  white-space: nowrap;
+  text-decoration: none;
+}
+.text-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #34563e;
+  white-space: nowrap;
+}
+.text-button:hover {
+  background: none;
+  color: #162d1d;
+  text-decoration: underline;
+}
+.page {
+  max-width: 1248px;
+  margin: auto;
+  padding: 36px 24px 56px;
+  min-height: 60vh;
+}
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.section-heading h2 {
+  margin: 0;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+  color: #596c50;
+  font-weight: bold;
+}
+.featured-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 36px;
+}
+.popular-movie {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 24px;
+  background: #e9eddf;
+  border-radius: 10px;
+  text-decoration: none;
+}
+.popular-movie img {
+  width: 42%;
+  max-height: 300px;
+  object-fit: cover;
+  aspect-ratio: 2 / 3;
+  border-radius: 5px;
+}
+.popular-movie h2 {
+  margin-top: 14px;
+  font-size: 30px;
+  overflow-wrap: anywhere;
+}
+.tag {
+  font-size: 12px;
+  font-weight: bold;
+}
+.recent-movies h2 {
+  font-size: 17px;
+}
+.recent-movie {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 18px;
+  text-decoration: none;
+}
+.recent-movie img {
+  width: 76px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.recent-movie p {
+  margin: 0;
+  color: #61665d;
+  font-size: 13px;
+}
+.catalogue {
+  margin-top: 40px;
+  border-top: 1px solid #dedfd7;
+  padding-top: 28px;
+}
+.count {
+  color: #697064;
+  font-size: 16px;
+  font-weight: normal;
+  margin-left: 8px;
+}
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 22px;
+}
+.poster {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #e8e5df;
+}
+.movie-card h3 {
+  margin: 12px 0 4px;
+}
+.movie-year,
+.movie-date {
+  color: #61665d;
+  font-size: 13px;
+}
+.movie-date {
+  font-size: 12px;
+}
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 14px;
+}
+.delete-button {
+  color: #933e32;
+  background: transparent;
+  border: 1px solid #d2aca5;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.delete-button:hover {
+  background: #933e32;
+}
+.empty-state {
+  grid-column: 1 / -1;
+  padding: 40px 20px;
+  border: 1px dashed #bcbfb7;
+  text-align: center;
+}
+.notice {
+  padding: 14px;
+  background: #e9eddf;
+  border-radius: 6px;
+  margin-bottom: 25px;
+}
+.site-footer {
+  border-top: 1px solid #dedfd7;
+  padding: 28px max(24px, calc((100% - 1200px) / 2));
+  background: white;
+}
+.site-footer h2 {
+  font-size: 18px;
+}
+.site-footer p {
+  color: #61665d;
+  font-size: 14px;
+}
+.copyright {
+  border-top: 1px solid #dedfd7;
+  padding-top: 20px;
+  margin-top: 24px;
+  text-align: center;
+}
+.visually-hidden,
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.skip-link:focus {
+  width: auto;
+  height: auto;
+  clip-path: none;
+  padding: 12px;
+  background: white;
+  z-index: 1;
+}
+@media (max-width: 1000px) {
+  .site-header {
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .search {
+    order: 3;
+    flex-basis: 100%;
+  }
+  nav {
+    margin-left: auto;
+  }
+  .movie-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .featured-grid {
+    gap: 24px;
+  }
+  .popular-movie {
+    gap: 16px;
+    padding: 16px;
+  }
+  .popular-movie h2 {
+    font-size: 24px;
+  }
+}
+@media (max-width: 600px) {
+  .site-header,
+  .page,
+  .site-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .site-header {
+    gap: 12px;
+  }
+  .brand {
+    font-size: 18px;
+  }
+  nav {
+    font-size: 13px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-size: 27px;
+  }
+  .section-heading {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .featured-grid {
+    grid-template-columns: 1fr;
+  }
+  .recent-movies {
+    display: none;
+  }
+  .movie-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 16px;
+  }
+  .popular-movie h2 {
+    font-size: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

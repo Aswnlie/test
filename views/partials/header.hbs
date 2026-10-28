@@ -1,0 +1,22 @@
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="brand" href="/">Movie<span>Reviews</span></a>
+  <form class="search" action="/" method="get" role="search">
+    <label class="visually-hidden" for="movie-search">Search movies by title</label>
+    <input id="movie-search" name="q" type="search" maxlength="100" placeholder="Search movie here..." value="{{query}}">
+    <button type="submit">Search</button>
+  </form>
+  <nav aria-label="Main navigation">
+    <a href="/">Home</a>
+    {{#if user}}
+      <a href="/account">{{user.username}}</a>
+      <form action="/logout" method="post">
+        <input type="hidden" name="csrf" value="{{csrf}}">
+        <button class="text-button" type="submit">Log out</button>
+      </form>
+    {{else}}
+      <a href="/login">Log in</a>
+      <a href="/register">Sign up</a>
+    {{/if}}
+  </nav>
+</header>

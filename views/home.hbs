@@ -1,0 +1,47 @@
+{{#if deleted}}<p class="notice" role="status">The movie and its reviews were deleted.</p>{{/if}}
+{{#unless query}}
+  {{#if popular}}
+    <section class="featured" aria-labelledby="featured-title">
+      <div class="section-heading"><div><p class="eyebrow">Find your next watch</p><h1 id="featured-title">Popular and new</h1></div><a href="#movies">Browse movies ↓</a></div>
+      <div class="featured-grid">
+        <a class="popular-movie" href="/movie/{{popular.id}}">
+          <img src="{{popular.posterPath}}" alt="Poster for {{popular.title}}">
+          <div><span class="tag">Most reviewed · {{popular.reviewCount}} reviews</span><h2>{{popular.title}}</h2><p>{{popular.releaseYear}}</p></div>
+        </a>
+        <div class="recent-movies">
+          <h2>Recently added</h2>
+          {{#each recent}}
+            <a class="recent-movie" href="/movie/{{id}}"><img src="{{posterPath}}" alt="Poster for {{title}}"><div><h3>{{title}}</h3><p>{{releaseYear}}</p><p>Added <time datetime="{{createdDate}}">{{createdDate}}</time></p></div></a>
+          {{else}}<p>More movies are on the way.</p>{{/each}}
+        </div>
+      </div>
+    </section>
+  {{else}}
+    <h1>Discover your next movie</h1>
+  {{/if}}
+{{else}}<h1>Search results</h1>{{/unless}}
+<section id="movies" class="catalogue" aria-labelledby="movies-title">
+  <div class="section-heading">
+    <div><h2 id="movies-title">Movies <span class="count">{{count}}</span></h2>{{#if query}}<p>Results for “{{query}}” · <a href="/">Clear search</a></p>{{/if}}</div>
+    {{#if user}}<a class="button" href="/movies/add">+ Add movie</a>{{else}}<a class="button" href="/login">Log in to add a movie</a>{{/if}}
+  </div>
+  <div class="movie-grid">
+    {{#each movies}}
+      <article class="movie-card">
+        <a class="poster-link" href="/movie/{{id}}" aria-label="View {{title}}"><img class="poster" src="{{posterPath}}" alt="Poster for {{title}}" loading="lazy"></a>
+        <h3>{{title}}</h3><p class="movie-year">{{releaseYear}}</p>
+        <p class="movie-date">{{dateLabel}}<br><time datetime="{{date}}">{{date}}</time></p>
+        <div class="card-actions"><a href="/movie/{{id}}">Details →</a>
+          {{#if @root.isAdmin}}
+            <form class="delete-movie" action="/movies/{{id}}/delete" method="post" data-title="{{title}}">
+              <input type="hidden" name="csrf" value="{{@root.csrf}}">
+              <button class="delete-button" type="submit">Delete</button>
+            </form>
+          {{/if}}
+        </div>
+      </article>
+    {{else}}
+      <div class="empty-state">{{#if hasMovies}}<h3>No matching movies</h3><p>Try another title or <a href="/">view all movies</a>.</p>{{else}}<h3>No movies yet</h3><p>Once a movie is added, it will appear here.</p>{{/if}}</div>
+    {{/each}}
+  </div>
+</section>

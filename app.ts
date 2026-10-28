@@ -1,3 +1,4 @@
+import { movieRouter } from "./movies/home.ts";
 import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
 import { Application, isHttpError } from "@oak/oak";
@@ -28,8 +29,22 @@ export function createApp(): Application<AuthState> {
       }
     }
   });
+  // Static files need no database session. Only expose these public folders.
+  app.use(async (ctx, next) => {
+    if (
+      (ctx.request.method === "GET" || ctx.request.method === "HEAD") &&
+      /^\/(css|js|images|uploads)\//.test(ctx.request.url.pathname)
+    ) {
+      await ctx.send({ root: `${Deno.cwd()}/public` });
+      return;
+    }
+    await next();
+  });
   // load user before auth check
   app.use(loadUser);
+  const homeRoutes = movieRouter();
+  app.use(homeRoutes.routes());
+  app.use(homeRoutes.allowedMethods());
   const accountRoutes = loginRouter();
   app.use(accountRoutes.routes());
   app.use(accountRoutes.allowedMethods());

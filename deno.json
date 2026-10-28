@@ -13,9 +13,9 @@
     "db:generate": "deno run -A --env-file=.env npm:drizzle-kit@0.31.11 generate",
     "db:migrate": "deno run -A --env-file=.env npm:drizzle-kit@0.31.11 migrate",
     "db:check": "deno run --no-prompt --env-file=.env --allow-env=DB_HOST,DB_PORT,DB_USER,DB_PASSWORD,DB_NAME,TZ --allow-read=./node_modules,../node_modules --allow-net scripts/check-db.ts",
-    "start": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules server.ts",
-    "test:registration": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/registration_test.ts",
-    "test:auth": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/",
+    "start": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./public,./views,./node_modules,../node_modules,../../node_modules,../../../node_modules server.ts",
+    "test:registration": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./public,./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/registration_test.ts",
+    "test:auth": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./public,./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/",
     "db:seed-users": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./node_modules,../node_modules,../../node_modules,../../../node_modules scripts/seed-users.ts"
   },
   "fmt": {

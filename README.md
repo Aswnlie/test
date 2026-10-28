@@ -102,3 +102,44 @@ account script only creates users.
 `main` is for checked versions of the project. `dev` is the shared development branch. Create a
 branch for each piece of work and open a pull request into `dev`. Once the team has checked the
 combined changes, open a pull request from `dev` into `main`.
+
+## Student 2 — Nurym Zhumabayev
+
+Branch `NurymZhumabayev` starts from `dev` and adds the homepage at `/`, shared header,
+responsive catalogue, title search, latest-review dates and administrator deletion.
+The frontend uses Handlebars HTML, plain CSS and plain JavaScript, with no frontend framework.
+`movies/catalogue.ts` reads the existing MySQL tables through the shared Drizzle client.
+No separate API service is needed: Oak renders the HTML and accepts normal form submissions.
+
+Open `docs/role-2.html` in a browser for the sitemap, task flows, user journeys and illustrated
+storyboard. `docs/explanation-ru.txt` explains each file and the request flow in Russian.
+The UX scenarios are proposed designs, not claims of completed usability testing.
+
+To enable administrator deletion, set `ADMIN_USER_IDS` in your local `.env` to the IDs of the
+intended existing users, separated by commas, then restart the server. An empty value grants
+nobody deletion permission. This is a small server-side access rule because the base schema
+has no administrator role field. Deletion checks the session, configured ID, CSRF token and
+movie ID; the existing foreign key cascades to reviews. JavaScript adds a confirmation dialog.
+
+Posters must use local `/uploads/...` URLs. Missing or unsupported images use a bundled placeholder.
+Static assets are served from `public/`. The temporary `public/css/home.css` can be incorporated
+into Student 5's final global `style.css`. Movie details (`/movie/:id`), movie creation
+(`/movies/add`) and review pages still belong to Students 3–5 and are not in the current base
+branch. Their navigation destinations are prepared here; these links need their implementations.
+No sample movies or fabricated reviews are inserted by this contribution.
+
+Run the homepage tests without MySQL (the store is replaced with in-memory fixtures):
+
+```sh
+DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=test DB_PASSWORD=test DB_NAME=test deno test --allow-env --allow-read tests/home_test.ts
+deno check app.ts
+```
+
+With a configured development MySQL database, also run the existing `deno task test:auth` suite
+and verify the catalogue with real movies/reviews. Open `http://localhost:8000/` after starting.
+
+### AI assistance for this contribution
+
+| Tool | Use | Verification |
+| --- | --- | --- |
+| OpenAI Codex | Helped implement Student 2 homepage, navigation, backend queries, tests and UX documentation | Type checking, automated route checks and browser layout checks; live MySQL verification requires local database configuration |

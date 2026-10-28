@@ -4,11 +4,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{title}} | Movie Reviews</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <script src="/js/home.js" defer></script>
   </head>
   <body>
-    {{> auth-header}}
-    <main>
+    {{> header}}
+    <main id="main" class="page" tabindex="-1">
       {{{body}}}
     </main>
+    <footer class="site-footer">
+      <div><h2>About us</h2><p>A place to discover films and share your reviews.</p></div>
+      <p class="copyright">Movie Reviews · Team 3</p>
+    </footer>
   </body>
 </html>
