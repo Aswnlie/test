@@ -105,44 +105,61 @@ combined changes, open a pull request from `dev` into `main`.
 
 ## Student 2 — Nurym Zhumabayev
 
-Branch `NurymZhumabayev` starts from `dev` and adds the homepage at `/`, shared header,
-responsive catalogue, title search, latest-review dates and administrator deletion.
-All page templates use the `.html` extension in `views/`. The server still renders them with
-Handlebars, so movies, sessions and CSRF protection keep working. The frontend uses plain CSS
-and JavaScript, with no frontend framework. Open pages through the running server; opening a
-template directly from disk will not substitute its `{{...}}` expressions.
-`movies/catalogue.ts` reads the existing MySQL tables through the shared Drizzle client.
-No separate API service is needed: Oak renders the HTML and accepts normal form submissions.
+The homepage is intentionally small: navigation and movie cards with title, year, poster,
+latest-review date (or creation date), Details link and an administrator Delete button.
+There is no search or featured section. All app pages share `public/css/style.css` with
+semantic element/attribute selectors, no inline CSS and a mobile media query.
 
-Open `docs/role-2.html` in a browser for the sitemap, task flows, user journeys and illustrated
-storyboard. `docs/explanation-ru.txt` explains each file and the request flow in Russian.
-The UX scenarios are proposed designs, not claims of completed usability testing.
+The `.html` templates still use Handlebars layouts and partials on the Deno/Oak server.
+`public/js/home.js` calls the API with `fetch` and fills cards using `textContent`.
+Open the site through the server, not by opening a template from disk.
 
-To enable administrator deletion, set `ADMIN_USER_IDS` in your local `.env` to the IDs of the
-intended existing users, separated by commas, then restart the server. An empty value grants
-nobody deletion permission. This is a small server-side access rule because the base schema
-has no administrator role field. Deletion checks the session, configured ID, CSRF token and
-movie ID; the existing foreign key cascades to reviews. JavaScript adds a confirmation dialog.
+### Simple API
 
-Posters must use local `/uploads/...` URLs. Missing or unsupported images use a bundled placeholder.
-Static assets are served from `public/`. The temporary `public/css/home.css` can be incorporated
-into Student 5's final global `style.css`. Movie details (`/movie/:id`), movie creation
-(`/movies/add`) and review pages still belong to Students 3–5 and are not in the current base
-branch. Their navigation destinations are prepared here; these links need their implementations.
-No sample movies or fabricated reviews are inserted by this contribution.
+| Request | Result |
+| --- | --- |
+| `GET /api/movies` | JSON containing `movies`, `isAdmin` and `csrf` |
+| `POST /api/movies/:id/delete` | Deletes a movie; body is a URL-encoded `csrf` field; returns a JSON message |
 
-Run the homepage tests without MySQL (the store is replaced with in-memory fixtures):
+The list is public. An administrator's list response includes the CSRF token needed for deletion.
+Requests use the existing session cookie. An empty `ADMIN_USER_IDS` in `.env` grants no deletion
+permission. Set it to the IDs of the intended existing users and restart the server.
+The delete handler checks session, admin ID, CSRF and movie ID. Existing foreign keys delete
+related reviews. API errors return `{ "error": "..." }` with the appropriate HTTP status.
+
+`movies/catalogue.ts` uses the existing MySQL/Drizzle client. No new database or API server is
+required. Uploaded posters use `/uploads/...`; missing images use a bundled placeholder.
+
+### Files and checks
+
+- `views/home.html`: page and reusable card template.
+- `views/partials/header.html`: navigation.
+- `public/css/style.css`: shared styles.
+- `public/js/home.js`: load cards and send deletion requests.
+- `movies/home.ts`: homepage and the two API routes.
+- `movies/catalogue.ts`: database queries.
+- `docs/role-2.html`: sitemap, journeys and storyboard (proposed scenarios, not testing results).
+- `docs/explanation-ru.txt`: short Russian explanation and outstanding assignment work.
+
+Run the API tests without MySQL using a test store:
 
 ```sh
 DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=test DB_PASSWORD=test DB_NAME=test deno test --allow-env --allow-read tests/home_test.ts
-deno check app.ts
+deno check server.ts tests/*.ts
 ```
 
-With a configured development MySQL database, also run the existing `deno task test:auth` suite
-and verify the catalogue with real movies/reviews. Open `http://localhost:8000/` after starting.
+Real database verification requires a configured `.env` and MySQL. Details (`/movie/:id`),
+adding movies (`/movies/add`), reviews and movie seed data remain the other students' work;
+they are not implemented in this branch. The complete assignment also needs actual research,
+two prototype iterations, user testing and each student's own individual presentation.
 
-### AI assistance for this contribution
+### AI assistance
 
-| Tool | Use | Verification |
-| --- | --- | --- |
-| OpenAI Codex | Helped implement Student 2 homepage, navigation, backend queries, tests and UX documentation | Type checking, automated route checks and browser layout checks; live MySQL verification requires local database configuration |
+This branch is AI-assisted and must not be described as fully compliant with the assignment's
+restriction on AI-generated digital assets. The newly supplied brief prohibits that use.
+Clarify permitted use with the module team before submission; a disclosure alone does not
+remove the restriction. Personal reflections and real user-testing evidence are not generated here.
+
+| Tool | Use |
+| --- | --- |
+| OpenAI Codex | Generated and revised Student 2 code, proposed UX material, documentation and automated tests |

@@ -9,7 +9,6 @@ export interface MovieCard {
   posterPath: string;
   createdDate: string;
   lastReviewDate: string | null;
-  reviewCount: number;
 }
 
 export const catalogue = {
@@ -22,7 +21,6 @@ export const catalogue = {
       posterPath: movies.posterPath,
       createdDate: sql<string>`DATE_FORMAT(${movies.createdAt}, '%Y-%m-%d')`,
       lastReviewDate: sql<string | null>`DATE_FORMAT(MAX(${reviews.createdAt}), '%Y-%m-%d')`,
-      reviewCount: sql<number>`COUNT(${reviews.id})`.mapWith(Number),
     }).from(movies).leftJoin(reviews, eq(movies.id, reviews.movieId))
       .groupBy(movies.id, movies.title, movies.releaseYear, movies.posterPath, movies.createdAt)
       .orderBy(desc(movies.createdAt), desc(movies.id));

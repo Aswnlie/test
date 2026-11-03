@@ -1,0 +1,31 @@
+/* One shared stylesheet. Element selectors keep the layout simple. */
+* { box-sizing: border-box; }
+body { margin: 0; color: #222; background: #f5f5f5; font: 16px/1.5 Arial, sans-serif; }
+body > header, main, body > footer { max-width: 1100px; margin: auto; padding: 20px; }
+body > a { display: inline-block; margin: 8px 20px; }
+body > header { display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 1px solid #ccc; }
+nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+a { color: #215d3a; }
+button { padding: 8px 14px; border: 1px solid #215d3a; border-radius: 4px; background: #215d3a; color: white; cursor: pointer; font: inherit; }
+button:disabled { opacity: 0.6; cursor: wait; }
+input { padding: 8px; border: 1px solid #888; border-radius: 4px; font: inherit; max-width: 100%; }
+label, small { display: block; }
+small { color: #555; }
+main { min-height: 65vh; }
+main > section[aria-label="Movie list"] { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+article { padding: 16px; background: white; border: 1px solid #ccc; border-radius: 4px; overflow-wrap: anywhere; }
+article img { width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; background: #eee; }
+article h2 { margin: 12px 0; font-size: 20px; }
+article p { margin: 8px 0; }
+article button { margin: 8px 0 0 12px; background: #8a3025; border-color: #8a3025; }
+body > footer { border-top: 1px solid #ccc; }
+:focus-visible { outline: 3px solid #b47713; outline-offset: 3px; }
+[hidden] { display: none; }
+@media (max-width: 700px) {
+  body > header { align-items: flex-start; flex-direction: column; }
+  main > section[aria-label="Movie list"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  article { padding: 12px; }
+}
+@media (max-width: 360px) {
+  main > section[aria-label="Movie list"] { grid-template-columns: 1fr; }
+}
