@@ -1,1 +1,33 @@
+{{#if notFound}}
+<section class="movie-not-found">
+  <h1>Movie not found</h1>
+  <p>This movie does not exist or was removed.</p>
+  <a href="/">Back to the home page</a>
+</section>
+{{else}}
+<article class="movie-details">
+  <header class="movie-details__header">
+    <h1>{{title}}</h1>
+  </header>
 
+  <img class="movie-details__poster" src="{{posterPath}}" alt="Poster of {{title}}">
+
+  <dl class="movie-details__info">
+    <dt>Director</dt>
+    <dd>{{director}}</dd>
+    <dt>Year of release</dt>
+    <dd>{{releaseYear}}</dd>
+    <dt>Added by</dt>
+    <dd>{{author}}</dd>
+    <dt>Date added</dt>
+    <dd><time datetime="{{addedOn}}">{{addedOn}}</time></dd>
+  </dl>
+
+  <section class="movie-details__description">
+    <h2>Description</h2>
+    <div class="markdown">{{{descriptionHtml}}}</div>
+  </section>
+
+  <a class="movie-details__back" href="/">Back to all movies</a>
+</article>
+{{/if}}
