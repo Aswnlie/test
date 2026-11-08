@@ -13,7 +13,7 @@ export interface MovieCard {
 
 export const catalogue = {
   async list(): Promise<MovieCard[]> {
-    // One grouped query: movies without reviews are kept by LEFT JOIN.
+    // LEFT JOIN сохраняет фильмы без отзывов; MAX находит дату последнего отзыва.
     return await db.select({
       id: movies.id,
       title: movies.title,
@@ -21,12 +21,14 @@ export const catalogue = {
       posterPath: movies.posterPath,
       createdDate: sql<string>`DATE_FORMAT(${movies.createdAt}, '%Y-%m-%d')`,
       lastReviewDate: sql<string | null>`DATE_FORMAT(MAX(${reviews.createdAt}), '%Y-%m-%d')`,
-    }).from(movies).leftJoin(reviews, eq(movies.id, reviews.movieId))
+    })
+      .from(movies)
+      .leftJoin(reviews, eq(movies.id, reviews.movieId))
       .groupBy(movies.id, movies.title, movies.releaseYear, movies.posterPath, movies.createdAt)
       .orderBy(desc(movies.createdAt), desc(movies.id));
   },
   async remove(id: number): Promise<boolean> {
-    // The existing foreign key also deletes this movie's reviews.
+    // ON DELETE CASCADE в существующей БД удалит отзывы этого фильма.
     const [result] = await db.delete(movies).where(eq(movies.id, id));
     return result.affectedRows > 0;
   },

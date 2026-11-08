@@ -4,20 +4,21 @@ import { csrfToken, readForm, verifyCsrf } from "../auth/security.ts";
 import { render } from "../views/render.ts";
 import { catalogue, type MovieCard } from "./catalogue.ts";
 
-// IDs come only from the server configuration, never from the browser.
+// Права задаются на сервере. Пустой ADMIN_USER_IDS запрещает удаление всем.
 export function isAdmin(user: AuthState["user"]): boolean {
   const ids = (Deno.env.get("ADMIN_USER_IDS") ?? "").split(",").map((id) => id.trim());
   return !!user && ids.includes(String(user.id));
 }
 
+// Подготавливаем постер и дату для карточки фильма.
 export function cardData(movie: MovieCard) {
+  const localPoster = /^\/uploads\/[a-zA-Z0-9_./-]+$/.test(movie.posterPath);
+  const safePath = !movie.posterPath.split("/").includes("..");
+  const posterPath = localPoster && safePath ? movie.posterPath : "/images/poster-placeholder.svg";
+
   return {
     ...movie,
-    // Uploaded posters are served locally, in keeping with the app's CSP.
-    posterPath: /^\/uploads\/[a-zA-Z0-9_./-]+$/.test(movie.posterPath) &&
-        !movie.posterPath.split("/").includes("..")
-      ? movie.posterPath
-      : "/images/poster-placeholder.svg",
+    posterPath,
     date: movie.lastReviewDate ?? movie.createdDate,
     dateLabel: movie.lastReviewDate ? "Last review" : "Added",
   };
@@ -25,27 +26,26 @@ export function cardData(movie: MovieCard) {
 
 export function movieRouter(store = catalogue): Router<AuthState> {
   const router = new Router<AuthState>();
+  // 1. Читаем фильмы из БД и передаём их в HTML-шаблон.
   router.get("/", async (ctx) => {
+    const movies = (await store.list()).map(cardData);
+    const user = ctx.state.user;
+
     ctx.response.type = "html";
     ctx.response.body = render("home", {
       title: "Movies",
-      user: ctx.state.user,
-      csrf: ctx.state.user ? await csrfToken(ctx) : "",
+      movies,
+      user,
+      isAdmin: isAdmin(user),
+      csrf: user ? await csrfToken(ctx) : "",
+      deleted: ctx.request.url.searchParams.get("deleted") === "1",
     });
   });
 
-  router.get("/api/movies", async (ctx) => {
-    const admin = isAdmin(ctx.state.user);
-    ctx.response.body = {
-      movies: (await store.list()).map(cardData),
-      isAdmin: admin,
-      csrf: admin ? await csrfToken(ctx) : "",
-    };
-  });
-
+  // 2. Проверяем пользователя и CSRF, удаляем фильм и возвращаемся на главную.
   router.post(
-    "/api/movies/:id/delete",
-    async (ctx: RouterContext<"/api/movies/:id/delete", { id: string }, AuthState>) => {
+    "/movies/:id/delete",
+    async (ctx: RouterContext<"/movies/:id/delete", { id: string }, AuthState>) => {
       ctx.assert(ctx.state.user, 401, "Please sign in first.");
       ctx.assert(isAdmin(ctx.state.user), 403, "Only administrators can delete movies.");
       const form = await readForm(ctx);
@@ -57,7 +57,8 @@ export function movieRouter(store = catalogue): Router<AuthState> {
         "Invalid movie ID.",
       );
       ctx.assert(await store.remove(id), 404, "Movie not found.");
-      ctx.response.body = { message: "Movie and its reviews deleted." };
+      ctx.response.status = 303;
+      ctx.response.headers.set("Location", "/?deleted=1");
     },
   );
   return router;

@@ -105,43 +105,41 @@ combined changes, open a pull request from `dev` into `main`.
 
 ## Student 2 — Nurym Zhumabayev
 
-The homepage is intentionally small: navigation and movie cards with title, year, poster,
-latest-review date (or creation date), Details link and an administrator Delete button.
-There is no search or featured section. All app pages share `public/css/style.css` with
-semantic element/attribute selectors, no inline CSS and a mobile media query.
+This contribution follows the role sheet: Deno/Oak, MySQL with Drizzle, and Handlebars layouts
+and partials. The templates use `.hbs` again. The homepage displays each film's title, year,
+poster and latest review date, or creation date if it has no reviews. Dates use YYYY-MM-DD.
+There are links to Details and Add movie, plus an administrator-only delete form.
 
-The `.html` templates still use Handlebars layouts and partials on the Deno/Oak server.
-`public/js/home.js` calls the API with `fetch` and fills cards using `textContent`.
-Open the site through the server, not by opening a template from disk.
+### Simple request flow
 
-### Simple API
+1. The browser requests `GET /`.
+2. `movies/home.ts` calls the database functions in `movies/catalogue.ts`.
+3. `views/render.ts` renders `views/home.hbs` inside `views/layouts/main.hbs`.
+4. The browser receives complete HTML. No movie API or client-side card building is needed.
+5. Deletion submits `POST /movies/:id/delete`; after success, the server redirects to the homepage.
 
-| Request | Result |
-| --- | --- |
-| `GET /api/movies` | JSON containing `movies`, `isAdmin` and `csrf` |
-| `POST /api/movies/:id/delete` | Deletes a movie; body is a URL-encoded `csrf` field; returns a JSON message |
+JavaScript only adds a delete confirmation and missing-poster fallback. The list, navigation and
+form submission work without JavaScript; confirmation requires JavaScript. All app pages share
+`public/css/style.css`, with no inline CSS and a small responsive layout.
 
-The list is public. An administrator's list response includes the CSRF token needed for deletion.
-Requests use the existing session cookie. An empty `ADMIN_USER_IDS` in `.env` grants no deletion
-permission. Set it to the IDs of the intended existing users and restart the server.
-The delete handler checks session, admin ID, CSRF and movie ID. Existing foreign keys delete
-related reviews. API errors return `{ "error": "..." }` with the appropriate HTTP status.
-
-`movies/catalogue.ts` uses the existing MySQL/Drizzle client. No new database or API server is
-required. Uploaded posters use `/uploads/...`; missing images use a bundled placeholder.
+`ADMIN_USER_IDS` in `.env` contains comma-separated IDs of the intended existing administrators.
+An empty value grants no deletion permission. Restart after changing it. The server checks the
+session, administrator ID, CSRF and movie ID; the existing foreign key deletes related reviews.
+This configuration is used because the inherited schema has no user-role column.
 
 ### Files and checks
 
-- `views/home.html`: page and reusable card template.
-- `views/partials/header.html`: navigation.
+- `views/home.hbs`: readable card markup and the `each` loop.
+- `views/partials/header.hbs`: shared navigation.
+- `views/layouts/main.hbs`: shared document structure.
 - `public/css/style.css`: shared styles.
-- `public/js/home.js`: load cards and send deletion requests.
-- `movies/home.ts`: homepage and the two API routes.
-- `movies/catalogue.ts`: database queries.
-- `docs/role-2.html`: sitemap, journeys and storyboard (proposed scenarios, not testing results).
-- `docs/explanation-ru.txt`: short Russian explanation and outstanding assignment work.
+- `public/js/home.js`: confirmation and image fallback.
+- `movies/home.ts`: homepage and protected deletion routes.
+- `movies/catalogue.ts`: database reads and deletion.
+- `docs/role-2.html`: sitemap, journeys and storyboard, not fabricated testing results.
+- `docs/explanation-ru.txt`: Russian explanation for learning the code.
 
-Run the API tests without MySQL using a test store:
+Run the homepage tests without MySQL using a test store:
 
 ```sh
 DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=test DB_PASSWORD=test DB_NAME=test deno test --allow-env --allow-read tests/home_test.ts

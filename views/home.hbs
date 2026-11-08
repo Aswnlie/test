@@ -1,0 +1,34 @@
+<h1>Movies</h1>
+<p>Choose a movie to read more about it.</p>
+
+{{#if user}}
+  <p><a href="/movies/add">Add movie</a></p>
+{{else}}
+  <p><a href="/login">Log in to add a movie</a></p>
+{{/if}}
+
+{{#if deleted}}
+  <p role="status">The movie and its reviews were deleted.</p>
+{{/if}}
+
+<section aria-label="Movie list">
+  {{#each movies}}
+    <article>
+      <img src="{{posterPath}}" alt="Poster for {{title}}"
+        width="200" height="300" loading="lazy">
+      <h2>{{title}}</h2>
+      <p>Year: {{releaseYear}}</p>
+      <p>{{dateLabel}}: <time datetime="{{date}}">{{date}}</time></p>
+      <a href="/movie/{{id}}">Details</a>
+
+      {{#if @root.isAdmin}}
+        <form action="/movies/{{id}}/delete" method="post" data-delete-title="{{title}}">
+          <input type="hidden" name="csrf" value="{{@root.csrf}}">
+          <button type="submit">Delete</button>
+        </form>
+      {{/if}}
+    </article>
+  {{else}}
+    <p>No movies yet.</p>
+  {{/each}}
+</section>

@@ -22,9 +22,8 @@ export function createApp(): Application<AuthState> {
       const message = isHttpError(error) && error.expose
         ? error.message
         : "Something went wrong. Please try again later.";
-      ctx.response.body = ctx.request.url.pathname.startsWith("/api/")
-        ? { error: message }
-        : message;
+      ctx.response.type = "text";
+      ctx.response.body = message;
       // hide sensitive db details
       if (!isHttpError(error)) {
         console.error("Request failed with an internal error");

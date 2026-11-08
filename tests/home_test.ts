@@ -13,7 +13,7 @@ const movie: MovieCard = {
   lastReviewDate: null,
 };
 
-Deno.test("movie API: dates, empty list and admin delete protection", async () => {
+Deno.test("homepage: server rendering, dates, escaping and protected deletion", async () => {
   const previous = Deno.env.get("ADMIN_USER_IDS");
   Deno.env.set("ADMIN_USER_IDS", "7");
   let activeUser: AuthState["user"];
@@ -64,46 +64,45 @@ Deno.test("movie API: dates, empty list and admin delete protection", async () =
     return { status: response.status, headers: response.headers, text: await response.text() };
   }
   try {
-    const page = await request("/");
-    assertEquals(page.status, 200);
-    assert(page.text.includes('id="movie-card"'));
-    const guest = await request("/api/movies");
+    const guest = await request("/");
     assertEquals(guest.status, 200);
-    assert(guest.headers.get("content-type")?.includes("application/json"));
-    const data = JSON.parse(guest.text);
-    assertEquals(data.movies[0].date, "2026-01-02");
-    assertEquals(data.movies[0].dateLabel, "Added");
-    assertEquals(data.movies[1].date, "2026-10-28");
-    assertEquals(data.movies[1].dateLabel, "Last review");
-    assertEquals(data.movies[0].title, movie.title);
-    assertEquals(data.isAdmin, false);
-    assertEquals(data.csrf, "");
-    assertEquals((await request("/api/movies/1/delete", { csrf: "fake" })).status, 401);
+    assert(guest.headers.get("content-type")?.includes("text/html"));
+    assert(guest.text.includes("F1"));
+    assert(guest.text.includes('datetime="2026-01-02"'));
+    assert(guest.text.includes('datetime="2026-10-28"'));
+    assert(guest.text.includes("Last review:"));
+    assert(guest.text.includes("Added:"));
+    assert(guest.text.includes("&lt;script&gt;"));
+    assert(!guest.text.includes(movie.title));
+    assert(!guest.text.includes("data-delete-title="));
+    assertEquals((await request("/api/movies")).status, 404);
+    assertEquals((await request("/movies/1/delete", { csrf: "fake" })).status, 401);
     activeUser = { id: 8, username: "regular" };
-    assertEquals(JSON.parse((await request("/api/movies")).text).isAdmin, false);
-    assertEquals((await request("/api/movies/1/delete", { csrf: "fake" })).status, 403);
+    assert(!(await request("/")).text.includes("data-delete-title="));
+    assertEquals((await request("/movies/1/delete", { csrf: "fake" })).status, 403);
     activeUser = { id: 7, username: "admin" };
-    const admin = JSON.parse((await request("/api/movies")).text);
-    assertEquals(admin.isAdmin, true);
-    const csrf = admin.csrf;
-    assert(/^[a-f0-9]{64}$/.test(csrf));
-    assertEquals((await request("/api/movies/1/delete", { csrf: "fake" })).status, 403);
+    const admin = await request("/");
+    assert(admin.text.includes("data-delete-title="));
+    const csrf = admin.text.match(/name="csrf" value="([a-f0-9]+)"/)?.[1];
+    assert(csrf);
+    assertEquals((await request("/movies/1/delete", { csrf: "fake" })).status, 403);
     assertEquals(
-      (await request("/api/movies/1/delete", { csrf }, "https://evil.example")).status,
+      (await request("/movies/1/delete", { csrf }, "https://evil.example")).status,
       403,
     );
-    assertEquals((await request("/api/movies/invalid/delete", { csrf })).status, 400);
+    assertEquals((await request("/movies/invalid/delete", { csrf })).status, 400);
     assertEquals(removed.length, 0);
-    const deleted = await request("/api/movies/1/delete", { csrf });
-    assertEquals(deleted.status, 200);
-    assertEquals(JSON.parse(deleted.text).message, "Movie and its reviews deleted.");
+    const deleted = await request("/movies/1/delete", { csrf });
+    assertEquals(deleted.status, 303);
+    assertEquals(deleted.headers.get("Location"), "/?deleted=1");
+    assert((await request("/?deleted=1")).text.includes("were deleted"));
     assertEquals(removed, [1]);
-    assertEquals((await request("/api/movies/999/delete", { csrf })).status, 404);
-    assertEquals((await request("/api/movies/1/delete")).status, 405);
+    assertEquals((await request("/movies/999/delete", { csrf })).status, 404);
+    assertEquals((await request("/movies/1/delete")).status, 405);
     rows = [];
-    assertEquals(JSON.parse((await request("/api/movies")).text).movies, []);
+    assert((await request("/")).text.includes("No movies yet."));
     Deno.env.delete("ADMIN_USER_IDS");
-    assertEquals((await request("/api/movies/1/delete", { csrf })).status, 403);
+    assertEquals((await request("/movies/1/delete", { csrf })).status, 403);
     assertEquals(cardData(movie).date, "2026-01-02");
     assertEquals(
       cardData({ ...movie, posterPath: "javascript:alert(1)" }).posterPath,
