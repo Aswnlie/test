@@ -160,3 +160,34 @@ The migration adds `google_accounts`; it does not replace existing users. Google
 accounts created on one developer's machine do not appear in anyone else's
 local database. The password hash on a Google user is for a random, unused
 password, not their Google password.
+
+## Roles and deleting users
+
+Run `deno task db:migrate` after pulling this change. Existing accounts and new
+registrations, including Google accounts, have the `user` role by default.
+Registration forms cannot choose a role.
+
+To appoint an admin, a database maintainer can run this in MySQL, replacing the
+username with the intended account:
+
+```sql
+UPDATE users SET role = 'admin' WHERE username = 'your_admin_username';
+```
+
+Do not promote the public demo accounts. Visit `/admin` to check access: guests
+are redirected to login, ordinary users receive 403, and admins receive a short
+confirmation. This is an access check page, not a completed admin dashboard.
+Roles are read from the database on each request, so demotion takes effect on
+the next request without waiting for the session to expire.
+
+For admin routes, use `requireAdmin` from `auth/sessions.ts`. Use `requireUser`
+for signed-in users. Both work on GET and POST routes. Changing or deleting data
+also needs CSRF checks. For editing someone's movie or review, check ownership
+on the server or explicitly allow admins; a hidden button is not access control.
+Teammates must apply these checks when adding their feature routes.
+
+Deleting a user now deletes their movies, reviews, sessions and Google account
+link. Reviews written by other people on that user's movies are deleted too.
+Deleting a movie deletes all its reviews. There is no delete-user endpoint in
+this change. Do not delete real users just to test the cascade: the test suite
+uses temporary records and rolls the cascade test back.
