@@ -8,7 +8,7 @@ import { randomToken, toHex } from "./security.ts";
 const cookieName = "movie_session";
 const lifetime = authConfig.sessionLifetime;
 export interface AuthState {
-  user?: { id: number; username: string };
+  user?: { id: number; username: string; role: "user" | "admin" };
   sessionHash?: string;
 }
 
@@ -29,6 +29,7 @@ export const loadUser: Middleware<AuthState> = async (ctx, next) => {
     const [session] = await db.select({
       id: users.id,
       username: users.username,
+      role: users.role,
     })
       .from(sessions).innerJoin(users, eq(sessions.userId, users.id))
       .where(
@@ -92,6 +93,20 @@ export const requireUser: Middleware<AuthState> = async (ctx, next) => {
   if (!ctx.state.user) {
     ctx.response.status = 303;
     ctx.response.headers.set("Location", "/login");
+    return;
+  }
+  await next();
+};
+
+export const requireAdmin: Middleware<AuthState> = async (ctx, next) => {
+  if (!ctx.state.user) {
+    ctx.response.status = 303;
+    ctx.response.headers.set("Location", "/login");
+    return;
+  }
+  if (ctx.state.user.role !== "admin") {
+    ctx.response.status = 403;
+    ctx.response.body = "This page is only available to admins.";
     return;
   }
   await next();

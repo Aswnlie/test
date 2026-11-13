@@ -102,3 +102,92 @@ account script only creates users.
 `main` is for checked versions of the project. `dev` is the shared development branch. Create a
 branch for each piece of work and open a pull request into `dev`. Once the team has checked the
 combined changes, open a pull request from `dev` into `main`.
+
+## Google sign-in
+
+Create a Web application client in Google Auth Platform. Add this redirect URI:
+`http://localhost:8000/auth/google/callback`. In Testing mode, add your Google
+account to the test users.
+
+Put `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_REDIRECT_URI` in your
+local `.env`. Use `.env.example` for the variable names. Keep the secret out of
+Git. Run `deno task db:migrate`, then restart the server and open
+`http://localhost:8000/login`. Use localhost rather than 127.0.0.1 so the cookies
+and callback use the same host.
+
+The Google link on login and registration creates an account on the first visit
+and signs into that account on later visits. Google users get a generated
+username beginning with `google_`. Existing password accounts stay separate;
+we do not merge accounts by email. The app uses its normal session and logout
+for both login methods. No Google access or refresh tokens are stored.
+
+To check it, sign in with a test Google account, log out, and sign in again.
+The same username should appear both times. Cancel at Google to return to login.
+A missing or expired sign-in cookie should show an error instead of signing in.
+
+### Team setup after pulling this change
+
+Each developer uses their own local MySQL database. Pull the branch containing
+this change, then run:
+
+```sh
+deno install
+deno task db:migrate
+deno task test:auth
+deno task start
+```
+
+Add these values to your existing `.env` (keep your database settings):
+
+```dotenv
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+You can create your own Google Web application client for local development.
+If the team uses one client, its owner must add everyone's Google account to
+Test users while the app is in Testing mode. Share credentials privately, not
+through commits or the README. The callback URI must match exactly in Google
+Cloud and `.env`.
+
+If Google shows `redirect_uri_mismatch`, check the callback address. If access
+is blocked during testing, check Test users. If the site says Google sign-in is
+not configured, check the three variables and restart the server. Username and
+password login still works without Google settings.
+
+The migration adds `google_accounts`; it does not replace existing users. Google
+accounts created on one developer's machine do not appear in anyone else's
+local database. The password hash on a Google user is for a random, unused
+password, not their Google password.
+
+## Roles and deleting users
+
+Run `deno task db:migrate` after pulling this change. Existing accounts and new
+registrations, including Google accounts, have the `user` role by default.
+Registration forms cannot choose a role.
+
+To appoint an admin, a database maintainer can run this in MySQL, replacing the
+username with the intended account:
+
+```sql
+UPDATE users SET role = 'admin' WHERE username = 'your_admin_username';
+```
+
+Do not promote the public demo accounts. Visit `/admin` to check access: guests
+are redirected to login, ordinary users receive 403, and admins receive a short
+confirmation. This is an access check page, not a completed admin dashboard.
+Roles are read from the database on each request, so demotion takes effect on
+the next request without waiting for the session to expire.
+
+For admin routes, use `requireAdmin` from `auth/sessions.ts`. Use `requireUser`
+for signed-in users. Both work on GET and POST routes. Changing or deleting data
+also needs CSRF checks. For editing someone's movie or review, check ownership
+on the server or explicitly allow admins; a hidden button is not access control.
+Teammates must apply these checks when adding their feature routes.
+
+Deleting a user now deletes their movies, reviews, sessions and Google account
+link. Reviews written by other people on that user's movies are deleted too.
+Deleting a movie deletes all its reviews. There is no delete-user endpoint in
+this change. Do not delete real users just to test the cascade: the test suite
+uses temporary records and rolls the cascade test back.
