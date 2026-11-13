@@ -102,3 +102,25 @@ account script only creates users.
 `main` is for checked versions of the project. `dev` is the shared development branch. Create a
 branch for each piece of work and open a pull request into `dev`. Once the team has checked the
 combined changes, open a pull request from `dev` into `main`.
+
+## Google sign-in
+
+Create a Web application client in Google Auth Platform. Add this redirect URI:
+`http://localhost:8000/auth/google/callback`. In Testing mode, add your Google
+account to the test users.
+
+Put `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_REDIRECT_URI` in your
+local `.env`. Use `.env.example` for the variable names. Keep the secret out of
+Git. Run `deno task db:migrate`, then restart the server and open
+`http://localhost:8000/login`. Use localhost rather than 127.0.0.1 so the cookies
+and callback use the same host.
+
+The Google link on login and registration creates an account on the first visit
+and signs into that account on later visits. Google users get a generated
+username beginning with `google_`. Existing password accounts stay separate;
+we do not merge accounts by email. The app uses its normal session and logout
+for both login methods. No Google access or refresh tokens are stored.
+
+To check it, sign in with a test Google account, log out, and sign in again.
+The same username should appear both times. Cancel at Google to return to login.
+A missing or expired sign-in cookie should show an error instead of signing in.
