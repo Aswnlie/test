@@ -1,3 +1,4 @@
+import { googleRouter } from "./auth/google.ts";
 import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
 import { Application, isHttpError } from "@oak/oak";
@@ -30,6 +31,9 @@ export function createApp(): Application<AuthState> {
   });
   // load user before auth check
   app.use(loadUser);
+  const googleRoutes = googleRouter();
+  app.use(googleRoutes.routes());
+  app.use(googleRoutes.allowedMethods());
   const accountRoutes = loginRouter();
   app.use(accountRoutes.routes());
   app.use(accountRoutes.allowedMethods());
