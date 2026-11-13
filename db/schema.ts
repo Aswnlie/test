@@ -57,3 +57,9 @@ export const sessions = mysqlTable("sessions", {
 }, (table) => [
   index("sessions_expires_idx").on(table.expiresAt),
 ]);
+
+export const googleAccounts = mysqlTable("google_accounts", {
+  subject: varchar("subject", { length: 255 }).primaryKey(),
+  userId: int("user_id", { unsigned: true }).notNull().unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+});
