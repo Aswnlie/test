@@ -15,6 +15,13 @@
       "when": 1794591775812,
       "tag": "0001_stormy_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1794593284390,
+      "tag": "0002_flat_shriek",
+      "breakpoints": true
     }
   ]
 }

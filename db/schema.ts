@@ -6,6 +6,7 @@ import {
   index,
   int,
   mysqlTable,
+  mysqlEnum,
   smallint,
   text,
   tinyint,
@@ -16,6 +17,7 @@ import {
 export const users = mysqlTable("users", {
   id: int("id", { unsigned: true }).autoincrement().primaryKey(),
   username: varchar("username", { length: 50 }).notNull().unique(),
+  role: mysqlEnum("role", ["user", "admin"]).notNull().default("user"),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
@@ -28,7 +30,7 @@ export const movies = mysqlTable("movies", {
   description: text("description").notNull(),
   posterPath: varchar("poster_path", { length: 512 }).notNull(),
   userId: int("user_id", { unsigned: true }).notNull()
-    .references(() => users.id, { onDelete: "restrict" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 }, (table) => [
   // current year limit checked in movie handler
@@ -40,7 +42,7 @@ export const reviews = mysqlTable("reviews", {
   movieId: int("movie_id", { unsigned: true }).notNull()
     .references(() => movies.id, { onDelete: "cascade" }),
   userId: int("user_id", { unsigned: true }).notNull()
-    .references(() => users.id, { onDelete: "restrict" }),
+    .references(() => users.id, { onDelete: "cascade" }),
   rating: tinyint("rating", { unsigned: true }).notNull(),
   content: text("content").notNull(),
   createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
