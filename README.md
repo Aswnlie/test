@@ -124,3 +124,39 @@ for both login methods. No Google access or refresh tokens are stored.
 To check it, sign in with a test Google account, log out, and sign in again.
 The same username should appear both times. Cancel at Google to return to login.
 A missing or expired sign-in cookie should show an error instead of signing in.
+
+### Team setup after pulling this change
+
+Each developer uses their own local MySQL database. Pull the branch containing
+this change, then run:
+
+```sh
+deno install
+deno task db:migrate
+deno task test:auth
+deno task start
+```
+
+Add these values to your existing `.env` (keep your database settings):
+
+```dotenv
+GOOGLE_CLIENT_ID=your_client_id
+GOOGLE_CLIENT_SECRET=your_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+```
+
+You can create your own Google Web application client for local development.
+If the team uses one client, its owner must add everyone's Google account to
+Test users while the app is in Testing mode. Share credentials privately, not
+through commits or the README. The callback URI must match exactly in Google
+Cloud and `.env`.
+
+If Google shows `redirect_uri_mismatch`, check the callback address. If access
+is blocked during testing, check Test users. If the site says Google sign-in is
+not configured, check the three variables and restart the server. Username and
+password login still works without Google settings.
+
+The migration adds `google_accounts`; it does not replace existing users. Google
+accounts created on one developer's machine do not appear in anyone else's
+local database. The password hash on a Google user is for a random, unused
+password, not their Google password.
