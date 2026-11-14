@@ -7,7 +7,9 @@
     "handlebars": "npm:handlebars@^4.7.10",
     "mysql2": "npm:mysql2@^3.24.6",
     "@std/assert": "jsr:@std/assert@^1.0.19",
-    "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts"
+    "bcrypt": "https://deno.land/x/bcrypt@v0.4.1/mod.ts",
+    "marked": "npm:marked@^12.0.2",
+    "sanitize-html": "npm:sanitize-html@^2.13.0"
   },
   "tasks": {
     "db:generate": "deno run -A --env-file=.env npm:drizzle-kit@0.31.11 generate",
@@ -16,7 +18,8 @@
     "start": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules server.ts",
     "test:registration": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/registration_test.ts",
     "test:auth": "deno test --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./views,./node_modules,../node_modules,../../node_modules,../../../node_modules tests/",
-    "db:seed-users": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./node_modules,../node_modules,../../node_modules,../../../node_modules scripts/seed-users.ts"
+    "db:seed-users": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./node_modules,../node_modules,../../node_modules,../../../node_modules scripts/seed-users.ts",
+    "db:seed-movies": "deno run --no-prompt --env-file=.env --allow-env --allow-net --allow-read=./node_modules,../node_modules,../../node_modules,../../../node_modules scripts/seed-movies.ts"
   },
   "fmt": {
     "lineWidth": 100
