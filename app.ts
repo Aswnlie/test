@@ -1,3 +1,4 @@
+import { addMovieRouter } from "./movies/add.ts";
 import { googleRouter } from "./auth/google.ts";
 import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
@@ -40,5 +41,12 @@ export function createApp(): Application<AuthState> {
   const router = registrationRouter();
   app.use(router.routes());
   app.use(router.allowedMethods());
+  const addRoutes = addMovieRouter();
+  app.use(addRoutes.routes());
+  app.use(addRoutes.allowedMethods());
+  
+  
+  
+  
   return app;
 }

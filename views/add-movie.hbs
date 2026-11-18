@@ -1,0 +1,40 @@
+<h1>Add a movie</h1>
+<p>All fields are required. Your username and today's date are added automatically.</p>
+{{#if errors}}
+  <section role="alert" aria-label="Form errors">
+    <h2>Please check your details</h2>
+    <ul>
+      {{#each errors}}<li>{{this}}</li>{{/each}}
+    </ul>
+  </section>
+{{/if}}
+<form action="/movies/add" method="post" enctype="multipart/form-data">
+  <input type="hidden" name="csrf" value="{{csrf}}">
+  <p>
+    <label for="title">Movie title</label>
+    <input id="title" name="title" type="text" required maxlength="255" value="{{values.title}}">
+  </p>
+  <p>
+    <label for="director">Director</label>
+    <input id="director" name="director" type="text" required maxlength="255" value="{{values.director}}">
+  </p>
+       <p>
+    <label for="releaseYear">Release year: <output id="year-output" for="releaseYear">{{values.releaseYear}}</output></label>
+    <input id="releaseYear" name="releaseYear" type="range" min="{{minYear}}" max="{{maxYear}}" value="{{values.releaseYear}}" aria-describedby="year-help">
+    <small id="year-help">Slide to choose the release year.</small>
+  </p>
+  <script src="/movies/add/year-slider.js"></script>
+  <script src="/movies/add/year-slider.js"></script>
+  <p>
+    <label for="description">Description</label>
+    <textarea id="description" name="description" rows="8" required maxlength="5000" aria-describedby="description-help">{{values.description}}</textarea>
+    <small id="description-help">You can use Markdown, for example **bold** or a list with "-". Maximum 5000 characters.</small>
+  </p>
+  <p>
+    <label for="poster">Poster image</label>
+    <input id="poster" name="poster" type="file" required accept="image/png,image/jpeg,image/webp" aria-describedby="poster-help">
+    <small id="poster-help">PNG, JPEG or WebP, up to 2 MB.</small>
+  </p>
+  <button type="submit">Add movie</button>
+  <a href="/">Cancel</a>
+</form>
