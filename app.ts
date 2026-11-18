@@ -4,6 +4,7 @@ import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
 import { Application, isHttpError } from "@oak/oak";
 import { registrationRouter } from "./auth/register.ts";
+import { movieRouter } from "./movies/router.ts";
 
 export function createApp(): Application<AuthState> {
   const app = new Application<AuthState>();
@@ -44,9 +45,8 @@ export function createApp(): Application<AuthState> {
   const addRoutes = addMovieRouter();
   app.use(addRoutes.routes());
   app.use(addRoutes.allowedMethods());
-  
-  
-  
-  
+  const movieRoutes = movieRouter();
+  app.use(movieRoutes.routes());
+  app.use(movieRoutes.allowedMethods());
   return app;
 }

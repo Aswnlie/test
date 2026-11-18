@@ -2,7 +2,7 @@ import Handlebars from "handlebars";
 
 const templates = new Map<string, Handlebars.TemplateDelegate>();
 for (
-  const name of ["register", "registered", "login", "account", "add-movie", "layouts/main"]
+  const name of ["register", "registered", "login", "account", "movie", "add-movie", "layouts/main"]
 ) {
   const source = await Deno.readTextFile(
     new URL(`./${name}.hbs`, import.meta.url),
@@ -17,7 +17,7 @@ Handlebars.registerPartial(
 );
 
 export function render(
-  name: "register" | "registered" | "login" | "account" | "add-movie",
+  name: "register" | "registered" | "login" | "account" | "movie" | "add-movie",
   data: Record<string, unknown>,
 ): string {
   // render raw HTML only for our templates

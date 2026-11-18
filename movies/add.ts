@@ -66,7 +66,7 @@ export function addMovieRouter(): Router<AuthState> {
     await showForm(ctx, 200, {});
   });
 
-  router.post("/movies/add", requireUser, async (ctx) => {
+  router.post("/movies/add", requireUser, async (ctx: Context<AuthState>) => {
     // 1. Basic request checks before reading the body.
     const type = ctx.request.headers.get("content-type") ?? "";
     ctx.assert(type.startsWith("multipart/form-data"), 415, "Unsupported form format");
