@@ -4,10 +4,9 @@ import { csrfToken, readForm, verifyCsrf } from "../auth/security.ts";
 import { render } from "../views/render.ts";
 import { catalogue, type MovieCard } from "./catalogue.ts";
 
-// Права задаются на сервере. Пустой ADMIN_USER_IDS запрещает удаление всем.
+// Роль загружается из базы вместе с текущей сессией.
 export function isAdmin(user: AuthState["user"]): boolean {
-  const ids = (Deno.env.get("ADMIN_USER_IDS") ?? "").split(",").map((id) => id.trim());
-  return !!user && ids.includes(String(user.id));
+  return user?.role === "admin";
 }
 
 // Подготавливаем постер и дату для карточки фильма.

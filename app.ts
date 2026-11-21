@@ -1,3 +1,4 @@
+import { googleRouter } from "./auth/google.ts";
 import { movieRouter } from "./movies/home.ts";
 import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
@@ -46,6 +47,9 @@ export function createApp(): Application<AuthState> {
   const homeRoutes = movieRouter();
   app.use(homeRoutes.routes());
   app.use(homeRoutes.allowedMethods());
+  const googleRoutes = googleRouter();
+  app.use(googleRoutes.routes());
+  app.use(googleRoutes.allowedMethods());
   const accountRoutes = loginRouter();
   app.use(accountRoutes.routes());
   app.use(accountRoutes.allowedMethods());

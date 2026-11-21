@@ -1,3 +1,4 @@
+import type { AuthState } from "./sessions.ts";
 import {
   type Attempts,
   checkAttempts,
@@ -25,9 +26,17 @@ function duplicateUsername(error: unknown): boolean {
   return false;
 }
 
-export function registrationRouter(): Router {
-  const router = new Router();
+export function registrationRouter(): Router<AuthState> {
+  const router = new Router<AuthState>();
   const attempts: Attempts = new Map();
+  router.use(async (ctx, next) => {
+    if (ctx.request.url.pathname.startsWith("/register") && ctx.state.user) {
+      ctx.response.status = 303;
+      ctx.response.headers.set("Location", "/account");
+      return;
+    }
+    await next();
+  });
 
   router.get("/register", async (ctx) => {
     ctx.response.type = "html";

@@ -77,10 +77,10 @@ Deno.test("homepage: server rendering, dates, escaping and protected deletion", 
     assert(!guest.text.includes("data-delete-title="));
     assertEquals((await request("/api/movies")).status, 404);
     assertEquals((await request("/movies/1/delete", { csrf: "fake" })).status, 401);
-    activeUser = { id: 8, username: "regular" };
+    activeUser = { id: 8, username: "regular", role: "user" };
     assert(!(await request("/")).text.includes("data-delete-title="));
     assertEquals((await request("/movies/1/delete", { csrf: "fake" })).status, 403);
-    activeUser = { id: 7, username: "admin" };
+    activeUser = { id: 7, username: "admin", role: "admin" };
     const admin = await request("/");
     assert(admin.text.includes("data-delete-title="));
     const csrf = admin.text.match(/name="csrf" value="([a-f0-9]+)"/)?.[1];
@@ -101,7 +101,8 @@ Deno.test("homepage: server rendering, dates, escaping and protected deletion", 
     assertEquals((await request("/movies/1/delete")).status, 405);
     rows = [];
     assert((await request("/")).text.includes("No movies yet."));
-    Deno.env.delete("ADMIN_USER_IDS");
+    activeUser = { id: 7, username: "admin", role: "user" };
+    assert(!(await request("/")).text.includes("data-delete-title="));
     assertEquals((await request("/movies/1/delete", { csrf })).status, 403);
     assertEquals(cardData(movie).date, "2026-01-02");
     assertEquals(

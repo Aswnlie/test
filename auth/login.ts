@@ -12,7 +12,7 @@ import {
   validUsername,
   verifyCsrf,
 } from "./security.ts";
-import { type AuthState, endSession, requireUser, startSession } from "./sessions.ts";
+import { type AuthState, endSession, requireAdmin, requireUser, startSession } from "./sessions.ts";
 import { render } from "../views/render.ts";
 
 // run bcrypt even when the username does not exist
@@ -70,6 +70,9 @@ export function loginRouter(): Router<AuthState> {
       user: ctx.state.user,
       csrf: await csrfToken(ctx),
     });
+  });
+  router.get("/admin", requireAdmin, (ctx) => {
+    ctx.response.body = "Admin access confirmed.";
   });
   router.post("/logout", async (ctx) => {
     const form = await readForm(ctx);
