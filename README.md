@@ -235,9 +235,9 @@ DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=test DB_PASSWORD=test DB_NAME=test deno t
 deno check server.ts tests/*.ts
 ```
 
-Real database verification requires a configured `.env` and MySQL. Details (`/movie/:id`),
-adding movies (`/movies/add`), reviews and movie seed data remain the other students' work;
-they are not implemented in this branch. The complete assignment also needs actual research,
+Real database verification requires a configured `.env` and MySQL. Movie details
+(`/movie/:id`) and the movie seed script are integrated from dev. Adding movies
+(`/movies/add`) and review submission remain pending team features. The complete assignment also needs actual research,
 two prototype iterations, user testing and each student's own individual presentation.
 
 ### AI assistance
