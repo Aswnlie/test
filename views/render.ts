@@ -17,7 +17,7 @@ Handlebars.registerPartial(
 );
 
 export function render(
-  name: "register" | "registered" | "login" | "account", | "movie",
+  name: "register" | "registered" | "login" | "account" | "movie",
   data: Record<string, unknown>,
 ): string {
   // render raw HTML only for our templates

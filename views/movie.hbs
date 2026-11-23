@@ -27,49 +27,52 @@
     <h2>Description</h2>
     <div class="markdown">{{{descriptionHtml}}}</div>
   </section>
-  <section class="movie-details__reviews">
-    <h2>User Reviews</h2>
-    {{#if reviews.length}}
-      <div class="movie-details__reviews-list">
-        {{#each reviews}}
-          <div class="movie-details__review">
-            <span class="movie-details__review-rating">★ {{this.rating}}/5</span>
-            <span class="movie-details__review-author"><strong>{{this.username}}</strong></span>
-            <span class="movie-details__review-date"><time datetime="{{this.createdAt}}">{{this.createdAt}}</time></span>
-          
-          <div class="movie-details__review-body markdown">
-            {{{this.contentHtml}}}
-          </div>
-        </div>
-        {{/each}}
-      </div>
-    {{else}}
-      <p class="movie-details__no-reviews">No reviews yet. Be the first to review this movie!</p>
-    {{/if}}
-    {{#if user}}
-    <form action="/movies/{{id}}/reviews" method="POST">
-      <textarea name="content" placeholder="Write your review here..."></textarea>
-      
-      <input type="hidden" name="_csrf" value="{{csrfToken}}">
-    <input type="radio" name="rating" value="5" id="rating-5">
-    <label for="rating-5">5★ stars</label>
-    <input type="radio" name="rating" value="4" id="rating-4">
-    <label for="rating-4">4★ stars</label>
-    <input type="radio" name="rating" value="3" id="rating-3">
-    <label for="rating-3">3★ stars</label>
-    <input type="radio" name="rating" value="2" id="rating-2">
-    <label for="rating-2">2★ stars</label>
-    <input type="radio" name="rating" value="1" id="rating-1">
-    <label for="rating-1">1★ star</label>
-    <button type="submit" class="btn-primary">Submit Review</button>
-    </form>
-    {{else}}
-      <p class="movie-details__login-prompt">Please <a href="/login">log in</a> to submit a review.</p>
-    {{/if}}
-    
-    
-  </section>
 
-  <a class="movie-details__back" href="/">Back to all movies</a>
-</article>
+{{#if reviews.length}}
+  <div class="movie-details__reviews-list">
+    {{#each reviews}}
+      <article class="movie-details__review">
+        <div class="movie-details__review-header">
+          <span class="movie-details__review-rating">★ {{this.rating}}/5</span>
+          <span class="movie-details__review-author">{{this.username}}</span>
+          <time class="movie-details__review-date" datetime="{{this.createdAt}}">{{this.createdAt}}</time>
+        </div>
+        <div class="movie-details__review-body markdown">
+          {{{this.contentHtml}}}
+        </div>
+      </article>
+    {{/each}}
+  </div>
+{{else}}
+  <p class="movie-details__no-reviews">No reviews yet. Be the first to review this movie!</p>
+{{/if}}
+{{#if user}}
+  {{#if reviewError}}
+    <p class="alert alert--error" role="alert">{{reviewError}}</p>
+  {{/if}}
+
+  <form action="/movies/{{#if movie.id}}{{movie.id}}{{else}}{{id}}{{/if}}/reviews" method="post">
+    <input type="hidden" name="csrf" value="{{#if csrfToken}}{{csrfToken}}{{else}}{{csrf}}{{/if}}">
+
+    <div class="form-group">
+      <label for="rating">Rating (1 to 5 stars):</label>
+      <select id="rating" name="rating" required>
+        <option value="5" selected>★ ★ ★ ★ ★ (5 - Excellent)</option>
+        <option value="4">★ ★ ★ ★ ☆ (4 - Good)</option>
+        <option value="3">★ ★ ★ ☆ ☆ (3 - Average)</option>
+        <option value="2">★ ★ ☆ ☆ ☆ (2 - Poor)</option>
+        <option value="1">★ ☆ ☆ ☆ ☆ (1 - Terrible)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="content">Your review</label>
+      <textarea id="content" name="content" required maxlength="2000" placeholder="Write your review here...">{{reviewContent}}</textarea>
+      <small class="form-help">Markdown is supported: **bold**, *italic*, - list items.</small>
+    </div>
+
+    <button class="btn-primary" type="submit">Submit review</button>
+  </form>
+{{else}}
+  <p class="movie-details__login-prompt">Please <a href="/login">log in</a> to submit a review.</p>
 {{/if}}
