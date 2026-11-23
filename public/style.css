@@ -1,0 +1,638 @@
+/*
+  Movie Reviews: global stylesheet (public/css/style.css)
+
+  One shared file for every page, split into four cascade layers:
+
+    reset      remove browser defaults
+    base       typography, links, focus, code
+    layout     page frame: header, search, navigation, main, footer
+    components cards, home sections, forms, buttons, movie page, reviews
+
+  Colours: the team palette (coolors.co/10002b-240046-3c096c-5a189a-7b2cbf-9d4edd-c77dff-e0aaff).
+  Contrast checked: text and accent on the dark backgrounds are above 5:1.
+  7b2cbf and 5a189a are decorative only (borders, hover edges), never small text.
+
+  Layout follows the F1 wireframes: "Mobile" below 1280px, "Desktop" from 1280px (80em).
+  The file is mobile first; the desktop layout is added inside @media (min-width: 80em).
+
+  Elements and ARIA attributes are styled instead of class names, so there is no inline CSS
+  and the HTML stays semantic. Markup the layout expects:
+
+    header            site name, optional form[role="search"], nav
+    home (main)       h1, add movie link, section[aria-label="Popular and new"],
+                      section[aria-label="Movie list"], section[aria-label="About us"]
+    movie page        main > article: header, img, dl, section (description),
+                      section[aria-label="Reviews"] with one article per review,
+                      section[aria-label="Add review"]
+    add movie form    form with fieldset (movie types) holding label > input[type="checkbox"]
+*/
+
+@layer reset, base, layout, components;
+
+:root {
+  color-scheme: dark;
+
+  --color-bg: #10002b;
+  --color-surface: #240046;
+  --color-surface-raised: #3c096c;
+  --color-border: #5a189a;
+  --color-edge: #7b2cbf;
+  --color-field-border: #9d4edd;
+  --color-accent: #c77dff;
+  --color-text: #e0aaff;
+  --color-muted: #c77dff;
+  --color-on-accent: #10002b;
+  --color-danger: #d62839;
+  --color-on-danger: #ffffff;
+
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2.5rem;
+
+  --radius: 0.5rem;
+  --page-width: 80rem;
+  --poster-width: 14rem;
+  --transition: 150ms ease;
+}
+
+/* ---------- reset ---------- */
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body, h1, h2, h3, p, dl, dd, ul, ol, blockquote, pre, form {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+}
+
+/* ---------- base ---------- */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    --gutter: max(var(--space-4), calc((100% - var(--page-width)) / 2));
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+
+  /* vertical rhythm: every block gets space below, the last one in a box does not */
+  :is(h1, h2, h3, p, ul, ol, dl, blockquote, pre, form) {
+    margin-block-end: var(--space-4);
+  }
+
+  :is(h1, h2, h3, p, ul, ol, dl, blockquote, pre, form):last-child {
+    margin-block-end: 0;
+  }
+
+  h1, h2, h3 {
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+  }
+
+  h2 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+  }
+
+  h3 {
+    font-size: 1.125rem;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-underline-offset: 0.2em;
+  }
+
+  a:hover {
+    text-decoration-thickness: 0.15em;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+
+  ul, ol {
+    padding-inline-start: var(--space-5);
+  }
+
+  blockquote {
+    padding-inline-start: var(--space-4);
+    border-inline-start: 3px solid var(--color-edge);
+    color: var(--color-muted);
+  }
+
+  code, pre {
+    background: var(--color-surface-raised);
+    border-radius: var(--radius);
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 0.9em;
+  }
+
+  code {
+    padding: 0.1em 0.35em;
+  }
+
+  pre {
+    padding: var(--space-3) var(--space-4);
+    overflow-x: auto;
+  }
+
+  time {
+    color: var(--color-muted);
+  }
+}
+
+/* ---------- layout: page frame ---------- */
+@layer layout {
+  /* "Skip to content" link: hidden until it receives keyboard focus */
+  body > a:first-child {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: var(--space-4);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    transform: translateY(-120%);
+  }
+
+  body > a:first-child:focus {
+    transform: translateY(var(--space-2));
+  }
+
+  body > a:first-child:focus-visible {
+    outline-color: var(--color-on-accent);
+  }
+
+  /* mobile: site name and links in one row, search on its own row below */
+  body > header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-5);
+    padding: var(--space-4) var(--gutter);
+    background: var(--color-surface);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  body > header > :is(strong, p) {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  body > header > form[role="search"] {
+    flex: 1 1 100%;
+    order: 1;
+    margin: 0;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-4);
+  }
+
+  nav a {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+  }
+
+  nav form {
+    margin: 0;
+  }
+
+  main {
+    flex: 1;
+    padding: var(--space-6) var(--gutter);
+  }
+
+  /* sign in and register pages: one narrow centred column, as in the wireframe */
+  main:has(> form input[name="username"]) {
+    padding-inline: max(var(--space-4), calc((100% - 30rem) / 2));
+  }
+
+  main:has(> form input[name="username"]) > :is(h1, p) {
+    text-align: center;
+  }
+
+  body > footer {
+    padding: var(--space-4) var(--gutter);
+    border-block-start: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-muted);
+    text-align: center;
+  }
+
+  /* desktop (1280px and wider): site name, wide search, links on one line */
+  @media (min-width: 80em) {
+    body > header {
+      flex-wrap: nowrap;
+    }
+
+    body > header > form[role="search"] {
+      flex: 1 1 auto;
+      order: 0;
+      max-width: 44rem;
+    }
+  }
+}
+
+/* ---------- components ---------- */
+@layer components {
+  /* buttons, and the "Add movie" link which has to look like one */
+  :is(button, a[href="/movies/add"]) {
+    display: inline-block;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: filter var(--transition);
+  }
+
+  :is(button, a[href="/movies/add"]):hover {
+    filter: brightness(1.1);
+  }
+
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  nav button {
+    background: transparent;
+    border-color: var(--color-field-border);
+    color: var(--color-text);
+  }
+
+  [hidden] {
+    display: none;
+  }
+
+  /* forms */
+  label {
+    display: block;
+    margin-block-end: var(--space-1);
+    font-weight: 600;
+  }
+
+  /* a label wrapped around a checkbox or radio: box and text on one line */
+  label:has(> input[type="checkbox"], > input[type="radio"]) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-weight: 400;
+  }
+
+  :is(input, textarea, select):not([type="hidden"], [type="checkbox"], [type="radio"], [type="range"]) {
+    display: block;
+    width: 100%;
+    max-width: 40rem;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--color-field-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  textarea {
+    min-height: 9rem;
+    resize: vertical;
+  }
+
+  ::placeholder {
+    color: var(--color-muted);
+    opacity: 1;
+  }
+
+  /* upload boxes (poster, trailer): dashed field with a button */
+  input[type="file"] {
+    border-style: dashed;
+  }
+
+  input[type="file"]::file-selector-button {
+    margin-inline-end: var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  input[type="range"] {
+    width: min(100%, 20rem);
+    accent-color: var(--color-accent);
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    accent-color: var(--color-accent);
+  }
+
+  output {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* "Select movie type": two columns on mobile, three on desktop */
+  fieldset {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-4);
+    margin: 0 0 var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  legend {
+    padding-inline: var(--space-2);
+    font-weight: 600;
+  }
+
+  form small {
+    display: block;
+    margin-block-start: var(--space-1);
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  [role="alert"] {
+    padding: var(--space-3) var(--space-4);
+    border-inline-start: 4px solid var(--color-danger);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  [role="status"] {
+    color: var(--color-muted);
+  }
+
+  /* home: "Popular and new" (most reviewed movie big, newest movies small) */
+  section[aria-label="Popular and new"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  section[aria-label="Popular and new"] > article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  section[aria-label="Popular and new"] > article img {
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--color-surface-raised);
+  }
+
+  section[aria-label="Popular and new"] ul {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  section[aria-label="Popular and new"] li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  section[aria-label="Popular and new"] li img {
+    width: 5rem;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--color-surface-raised);
+  }
+
+  /* home: grid of movie cards, 2 per row on mobile, 4 on tablets, 6 on desktop */
+  section[aria-label="Movie list"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  section[aria-label="Movie list"] > article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+    overflow-wrap: anywhere;
+    transition: border-color var(--transition), transform var(--transition);
+  }
+
+  section[aria-label="Movie list"] > article:is(:hover, :focus-within) {
+    border-color: var(--color-edge);
+    transform: translateY(-2px);
+  }
+
+  section[aria-label="Movie list"] > article > * {
+    margin: 0;
+  }
+
+  section[aria-label="Movie list"] img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--color-surface-raised);
+  }
+
+  section[aria-label="Movie list"] h2 {
+    font-size: 1.125rem;
+  }
+
+  section[aria-label="Movie list"] p {
+    color: var(--color-muted);
+    font-size: 0.9rem;
+  }
+
+  section[aria-label="Movie list"] a {
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    text-decoration: none;
+  }
+
+  section[aria-label="Movie list"] a:hover {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  section[aria-label="Movie list"] button {
+    align-self: flex-start;
+    border-color: var(--color-danger);
+    background: var(--color-danger);
+    color: var(--color-on-danger);
+  }
+
+  /* home: "About us" block above the footer */
+  section[aria-label="About us"] {
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface);
+  }
+
+  /* movie details page */
+  main > article {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4) var(--space-5);
+  }
+
+  main > article > img {
+    width: 100%;
+    max-width: var(--poster-width);
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--color-surface-raised);
+  }
+
+  main > article dl {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-content: start;
+    gap: var(--space-1) var(--space-4);
+  }
+
+  main > article dt {
+    color: var(--color-muted);
+  }
+
+  main > article dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  main > article section {
+    padding-block-start: var(--space-4);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  /* reviews: cards side by side on tablets and desktop, like the "Comments" row */
+  main > article section[aria-label="Reviews"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3) var(--space-4);
+  }
+
+  main > article section[aria-label="Reviews"] > :not(article) {
+    margin: 0;
+  }
+
+  /* one review */
+  main > article article {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-accent);
+    border-radius: var(--radius);
+    background: var(--color-surface-raised);
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 48em) {
+    section[aria-label="Movie list"] {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    main > article {
+      grid-template-columns: minmax(0, var(--poster-width)) minmax(0, 1fr);
+    }
+
+    main > article > :is(header, section, a) {
+      grid-column: 1 / -1;
+    }
+
+    main > article section[aria-label="Reviews"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    main > article section[aria-label="Reviews"] > :not(article) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* desktop wireframe (1280px and wider) */
+  @media (min-width: 80em) {
+    section[aria-label="Popular and new"] {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      align-items: start;
+    }
+
+    section[aria-label="Movie list"] {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    fieldset {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    main > article section[aria-label="Reviews"] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button,
+    section[aria-label="Movie list"] > article {
+      transition: none;
+    }
+  }
+}
