@@ -27,52 +27,43 @@
     <h2>Description</h2>
     <div class="markdown">{{{descriptionHtml}}}</div>
   </section>
+  <section aria-label="Reviews">
+    <h2>User reviews</h2>
+    {{#if reviews.length}}
+      {{#each reviews}}
+        <article>
+          <h3>★ {{this.rating}}/5 · {{this.username}}</h3>
+          <p><time datetime="{{this.createdAt}}">{{this.createdAt}}</time></p>
+          <div class="markdown">{{{this.contentHtml}}}</div>
+        </article>
+      {{/each}}
+    {{else}}
+      <p>No reviews yet. Be the first to review this movie!</p>
+    {{/if}}
+  </section>
 
-{{#if reviews.length}}
-  <div class="movie-details__reviews-list">
-    {{#each reviews}}
-      <article class="movie-details__review">
-        <div class="movie-details__review-header">
-          <span class="movie-details__review-rating">★ {{this.rating}}/5</span>
-          <span class="movie-details__review-author">{{this.username}}</span>
-          <time class="movie-details__review-date" datetime="{{this.createdAt}}">{{this.createdAt}}</time>
-        </div>
-        <div class="movie-details__review-body markdown">
-          {{{this.contentHtml}}}
-        </div>
-      </article>
-    {{/each}}
-  </div>
-{{else}}
-  <p class="movie-details__no-reviews">No reviews yet. Be the first to review this movie!</p>
-{{/if}}
-{{#if user}}
-  {{#if reviewError}}
-    <p class="alert alert--error" role="alert">{{reviewError}}</p>
-  {{/if}}
+  <section aria-label="Add review">
+    <h2>Write a review</h2>
+    {{#if user}}
+      {{#if reviewError}}<p role="alert">{{reviewError}}</p>{{/if}}
+      <form action="/movie/{{id}}/review" method="post">
+        <input type="hidden" name="csrf" value="{{csrf}}">
+        <p>
+          <label for="rating">Rating: <output for="rating">3</output> / 5</label>
+          <input id="rating" name="rating" type="range" min="1" max="5" step="1" value="3" required>
+        </p>
+        <p>
+          <label for="content">Your review</label>
+          <textarea id="content" name="content" required maxlength="2000">{{reviewContent}}</textarea>
+          <small>Markdown is supported: **bold**, *italic*, - list items.</small>
+        </p>
+        <button type="submit">Submit review</button>
+      </form>
+    {{else}}
+      <p>Please <a href="/login">log in</a> to submit a review.</p>
+    {{/if}}
+  </section>
 
-  <form action="/movies/{{#if movie.id}}{{movie.id}}{{else}}{{id}}{{/if}}/reviews" method="post">
-    <input type="hidden" name="csrf" value="{{#if csrfToken}}{{csrfToken}}{{else}}{{csrf}}{{/if}}">
-
-    <div class="form-group">
-      <label for="rating">Rating (1 to 5 stars):</label>
-      <select id="rating" name="rating" required>
-        <option value="5" selected>★ ★ ★ ★ ★ (5 - Excellent)</option>
-        <option value="4">★ ★ ★ ★ ☆ (4 - Good)</option>
-        <option value="3">★ ★ ★ ☆ ☆ (3 - Average)</option>
-        <option value="2">★ ★ ☆ ☆ ☆ (2 - Poor)</option>
-        <option value="1">★ ☆ ☆ ☆ ☆ (1 - Terrible)</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="content">Your review</label>
-      <textarea id="content" name="content" required maxlength="2000" placeholder="Write your review here...">{{reviewContent}}</textarea>
-      <small class="form-help">Markdown is supported: **bold**, *italic*, - list items.</small>
-    </div>
-
-    <button class="btn-primary" type="submit">Submit review</button>
-  </form>
-{{else}}
-  <p class="movie-details__login-prompt">Please <a href="/login">log in</a> to submit a review.</p>
+  <a class="movie-details__back" href="/">Back to all movies</a>
+</article>
 {{/if}}
