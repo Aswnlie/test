@@ -2,7 +2,7 @@ import Handlebars from "handlebars";
 
 const templates = new Map<string, Handlebars.TemplateDelegate>();
 for (
-  const name of ["register", "registered", "login", "account", "movie", "layouts/main"]
+  const name of ["register", "registered", "login", "account", "home", "movie", "layouts/main"]
 ) {
   const source = await Deno.readTextFile(
     new URL(`./${name}.hbs`, import.meta.url),
@@ -10,14 +10,14 @@ for (
   templates.set(name, Handlebars.compile(source));
 }
 Handlebars.registerPartial(
-  "auth-header",
+  "header",
   await Deno.readTextFile(
-    new URL("./partials/auth-header.hbs", import.meta.url),
+    new URL("./partials/header.hbs", import.meta.url),
   ),
 );
 
 export function render(
-  name: "register" | "registered" | "login" | "account" | "movie",
+  name: "register" | "registered" | "login" | "account" | "home" | "movie",
   data: Record<string, unknown>,
 ): string {
   // render raw HTML only for our templates

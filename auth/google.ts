@@ -1,5 +1,5 @@
 import { Router } from "@oak/oak";
-import { CodeChallengeMethod, OAuth2Client } from "npm:google-auth-library@10.5.0";
+import { CodeChallengeMethod, OAuth2Client } from "google-auth-library";
 import { eq } from "drizzle-orm";
 import { db } from "../db/client.ts";
 import { googleAccounts, users } from "../db/schema.ts";

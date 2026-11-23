@@ -7,7 +7,7 @@ const server = Deno.serve(
     hostname: "127.0.0.1",
     port: 8000,
     onListen() {
-      console.log("Movie Reviews: http://localhost:8000/login");
+      console.log("Movie Reviews: http://localhost:8000/");
     },
   },
   async (request, info) =>

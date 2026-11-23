@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="500" viewBox="0 0 360 500">
+  <rect width="360" height="500" fill="#e8e5df" />
+  <rect x="110" y="170" width="140" height="115" rx="12" fill="none" stroke="#85847c"
+    stroke-width="4" />
+  <path d="M110 198h140M110 257h140M140 170v28m35-28v28m35-28v28m-70 59v28m35-28v28m35-28v28"
+    stroke="#85847c" stroke-width="4" />
+  <text x="180" y="325" text-anchor="middle" font-family="Arial,sans-serif" font-size="18"
+    fill="#55584f">Poster unavailable</text>
+</svg>

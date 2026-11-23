@@ -2,7 +2,7 @@ import { assertEquals } from "@std/assert";
 import { eq } from "drizzle-orm";
 import { createApp } from "../app.ts";
 import { closeDatabase, db } from "../db/client.ts";
-import { googleAccounts, movies, reviews, sessions, users } from "../db/schema.ts";
+import { sessions, users } from "../db/schema.ts";
 import { randomToken } from "../auth/security.ts";
 import { tokenHash } from "../auth/sessions.ts";
 
@@ -38,4 +38,3 @@ Deno.test("admin access follows the current database role", async () => {
     await closeDatabase();
   }
 });
-

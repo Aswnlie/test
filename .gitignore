@@ -3,3 +3,6 @@
 !.env.example
 node_modules/
 .DS_Store
+.local-backups/
+
+.local-mysql/

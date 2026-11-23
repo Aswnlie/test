@@ -191,3 +191,86 @@ link. Reviews written by other people on that user's movies are deleted too.
 Deleting a movie deletes all its reviews. There is no delete-user endpoint in
 this change. Do not delete real users just to test the cascade: the test suite
 uses temporary records and rolls the cascade test back.
+
+
+## Student 2 — Nurym Zhumabayev
+
+This contribution follows the role sheet: Deno/Oak, MySQL with Drizzle, and Handlebars layouts
+and partials. The templates use `.hbs` again. The homepage displays each film's title, year,
+poster and latest review date, or creation date if it has no reviews. Dates use YYYY-MM-DD.
+There are links to Details and Add movie, plus an administrator-only delete form.
+
+### Simple request flow
+
+1. The browser requests `GET /`.
+2. `movies/home.ts` calls the database functions in `movies/catalogue.ts`.
+3. `views/render.ts` renders `views/home.hbs` inside `views/layouts/main.hbs`.
+4. The browser receives complete HTML. No movie API or client-side card building is needed.
+5. Deletion submits `POST /movies/:id/delete`; after success, the server redirects to the homepage.
+
+JavaScript only adds a delete confirmation and missing-poster fallback. The list, navigation and
+form submission work without JavaScript; confirmation requires JavaScript. All app pages share
+`public/css/style.css`, with no inline CSS and a small responsive layout.
+
+Deletion uses the current `users.role` from the database: only `admin` can delete.
+The server checks the session, role, CSRF and movie ID. The database cascades related reviews.
+The old `ADMIN_USER_IDS` environment variable is no longer used.
+
+### Files and checks
+
+- `views/home.hbs`: readable card markup and the `each` loop.
+- `views/partials/header.hbs`: shared navigation.
+- `views/layouts/main.hbs`: shared document structure.
+- `public/css/style.css`: shared styles.
+- `public/js/home.js`: confirmation and image fallback.
+- `movies/home.ts`: homepage and protected deletion routes.
+- `movies/catalogue.ts`: database reads and deletion.
+- `docs/role-2.html`: sitemap, journeys and storyboard, not fabricated testing results.
+- `docs/explanation-ru.txt`: Russian explanation for learning the code.
+
+Run the homepage tests without MySQL using a test store:
+
+```sh
+DB_HOST=127.0.0.1 DB_PORT=3306 DB_USER=test DB_PASSWORD=test DB_NAME=test deno test --allow-env --allow-read tests/home_test.ts
+deno check server.ts tests/*.ts
+```
+
+Real database verification requires a configured `.env` and MySQL. Movie details
+(`/movie/:id`) and the movie seed script are integrated from dev. Adding movies
+(`/movies/add`) and review submission remain pending team features. The complete assignment also needs actual research,
+two prototype iterations, user testing and each student's own individual presentation.
+
+### AI assistance
+
+This branch is AI-assisted and must not be described as fully compliant with the assignment's
+restriction on AI-generated digital assets. The newly supplied brief prohibits that use.
+Clarify permitted use with the module team before submission; a disclosure alone does not
+remove the restriction. Personal reflections and real user-testing evidence are not generated here.
+
+| Tool | Use |
+| --- | --- |
+| OpenAI Codex | Generated and revised Student 2 code, proposed UX material, documentation and automated tests |
+
+## Local integration source
+
+Backend imported from ae7378/Group2-3, branch zhanelassilbek/db-and-auth,
+commit 549c95391a6e626ae09ec3d1395862ce6625183e, supplied ZIP.
+Nurym's homepage, layout, navigation, CSS, JavaScript and UX documents are retained.
+Apply all bundled migrations to your local development database before starting.
+The local .env is preserved; DB_HOST, DB_PORT, DB_USER, DB_PASSWORD and DB_NAME
+must be supplied for a real MySQL instance. Google settings alone are insufficient.
+Use http://localhost:8000 for Google sign-in (the callback must use the same host).
+No remote repository was changed by this local integration.
+
+## Local test database on this computer
+
+A separate MySQL 8.4 instance is installed in `.local-mysql/` using official Ubuntu
+packages, without a system service. Its data and private credentials are excluded
+from Git. It listens only on `127.0.0.1:3307`, using database `movie_reviews_test`.
+Connection settings are in the local `.env`; Google settings were preserved.
+
+After a reboot, run `bash scripts/start-test-db.sh`, then `deno task start`.
+Open http://localhost:8000/. Demo accounts: user1, user2, user3; password: p455w0rd.
+These accounts have the ordinary user role. The catalogue starts empty.
+Run `deno task test:auth` to check the project against this dedicated test database.
+The MySQL binaries/data are local and are not included when cloning the repository.

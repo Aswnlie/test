@@ -1,9 +1,10 @@
+import { movieRouter as movieDetailsRouter } from "./movies/router.ts";
 import { googleRouter } from "./auth/google.ts";
+import { movieRouter } from "./movies/home.ts";
 import { loginRouter } from "./auth/login.ts";
 import { type AuthState, loadUser } from "./auth/sessions.ts";
 import { Application, isHttpError } from "@oak/oak";
 import { registrationRouter } from "./auth/register.ts";
-import { movieRouter } from "./movies/router.ts";
 
 export function createApp(): Application<AuthState> {
   const app = new Application<AuthState>();
@@ -20,18 +21,33 @@ export function createApp(): Application<AuthState> {
       await next();
     } catch (error) {
       ctx.response.status = isHttpError(error) ? error.status : 500;
-      ctx.response.type = "text";
-      ctx.response.body = isHttpError(error) && error.expose
+      const message = isHttpError(error) && error.expose
         ? error.message
         : "Something went wrong. Please try again later.";
+      ctx.response.type = "text";
+      ctx.response.body = message;
       // hide sensitive db details
       if (!isHttpError(error)) {
         console.error("Request failed with an internal error");
       }
     }
   });
+  // Static files need no database session. Only expose these public folders.
+  app.use(async (ctx, next) => {
+    if (
+      (ctx.request.method === "GET" || ctx.request.method === "HEAD") &&
+      /^\/(css|js|images|uploads)\//.test(ctx.request.url.pathname)
+    ) {
+      await ctx.send({ root: `${Deno.cwd()}/public` });
+      return;
+    }
+    await next();
+  });
   // load user before auth check
   app.use(loadUser);
+  const homeRoutes = movieRouter();
+  app.use(homeRoutes.routes());
+  app.use(homeRoutes.allowedMethods());
   const googleRoutes = googleRouter();
   app.use(googleRoutes.routes());
   app.use(googleRoutes.allowedMethods());
@@ -41,8 +57,8 @@ export function createApp(): Application<AuthState> {
   const router = registrationRouter();
   app.use(router.routes());
   app.use(router.allowedMethods());
-  const movieRoutes = movieRouter();
-  app.use(movieRoutes.routes());
-  app.use(movieRoutes.allowedMethods());
+  const detailsRoutes = movieDetailsRouter();
+  app.use(detailsRoutes.routes());
+  app.use(detailsRoutes.allowedMethods());
   return app;
 }
